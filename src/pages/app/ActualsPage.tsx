@@ -4,7 +4,6 @@ import { DailyActual } from '../../types';
 import { getAvgCreditPerRoom, fmt2, fmt1 } from '../../utils/calculations';
 import { today, formatFull, getDayName, getDayNameFull, addDaysStr } from '../../utils/dateUtils';
 import { Save, ChevronLeft, ChevronRight, Clock, Trash2, Plus, ClipboardPaste } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import PasteImportModal, { ColDef } from '../../components/PasteImportModal';
 
 const ACTUALS_COLS: ColDef[] = [
@@ -32,7 +31,6 @@ function emptyActual(date: string, propertyId: string): DailyActual {
 
 export default function ActualsPage() {
   const { currentProperty, currentPropertyId, getActualByDate, saveActual, deleteActual, actuals, weeklySchedules, otbEntries, mode } = useData();
-  const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState(today());
   const [form, setForm] = useState<DailyActual | null>(null);
   const [saved, setSaved] = useState(false);
@@ -62,7 +60,7 @@ export default function ActualsPage() {
   }, [selectedDate, currentPropertyId, getActualByDate, otbEntries, weeklySchedules]);
 
   const handleSave = () => {
-    if (mode === 'demo') { navigate('/login'); return; }
+    if (mode === 'demo') { return; }
     if (!form) return;
     saveActual({ ...form, updatedAt: new Date().toISOString() });
     setSaved(true);
@@ -167,7 +165,7 @@ export default function ActualsPage() {
                 </div>
               )}
             </div>
-            <button onClick={handleSave} className={`btn-primary flex items-center gap-1 text-sm ${saved ? 'opacity-70' : ''}`}>
+            <button onClick={handleSave} disabled={mode === 'demo'} className={`btn-primary flex items-center gap-1 text-sm ${saved ? 'opacity-70' : ''} ${mode === 'demo' ? 'opacity-50 cursor-not-allowed' : ''}`}>
               <Save size={14} /> {mode === 'demo' ? 'Sign In to Save' : saved ? 'Saved!' : 'Save Actuals'}
             </button>
           </div>

@@ -6,7 +6,6 @@ import { calculateDay, fmtInt, fmt2, fmt1, fmtPct } from '../../utils/calculatio
 import { getWeekStart, getWeekDates, getDayName, formatDisplay, weekRangeLabel, prevWeek, nextWeek, today } from '../../utils/dateUtils';
 import { format } from 'date-fns';
 import { ChevronLeft, ChevronRight, Save, Calendar, ClipboardPaste } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import PasteImportModal, { ColDef } from '../../components/PasteImportModal';
 
 const WEEKLY_COLS: ColDef[] = [
@@ -75,7 +74,6 @@ function VarianceBadge({ v }: { v: number | undefined }) {
 
 export default function WeeklySchedulePage() {
   const { currentProperty, currentPropertyId, getWeeklyByWeekStart, saveWeeklySchedule, mode } = useData();
-  const navigate = useNavigate();
   const [weekStart, setWeekStart] = useState(() => getWeekStart(today()).toISOString().split('T')[0]);
   const [schedule, setSchedule] = useState<WeeklySchedule | null>(null);
   const [saved, setSaved] = useState(false);
@@ -99,7 +97,7 @@ export default function WeeklySchedulePage() {
   }, []);
 
   const handleSave = () => {
-    if (mode === 'demo') { navigate('/login'); return; }
+    if (mode === 'demo') { return; }
     if (!schedule) return;
     saveWeeklySchedule(schedule);
     setSaved(true);
@@ -225,7 +223,7 @@ export default function WeeklySchedulePage() {
           <button onClick={() => setShowImport(true)} className="btn-ghost flex items-center gap-1 text-sm">
             <ClipboardPaste size={14} /> Import
           </button>
-          <button onClick={handleSave} className={`btn-primary flex items-center gap-1 text-sm ${saved ? 'opacity-70' : ''}`}>
+          <button onClick={handleSave} disabled={mode === 'demo'} className={`btn-primary flex items-center gap-1 text-sm ${saved ? 'opacity-70' : ''} ${mode === 'demo' ? 'opacity-50 cursor-not-allowed' : ''}`}>
             <Save size={14} /> {mode === 'demo' ? 'Sign In to Save' : saved ? 'Saved!' : 'Save'}
           </button>
           {mode === 'demo' && <span className="text-xs px-2 py-1 rounded" style={{ background: '#FBE8DC', color: '#C86848' }}>Demo</span>}

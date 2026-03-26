@@ -50,18 +50,9 @@ export default function LandingPage() {
                 <ArrowRight size={16} />
               </button>
               <button
-                onClick={() => navigate('/register')}
+                onClick={() => navigate('/demo/weekly')}
                 className="px-6 py-3 rounded font-medium text-base transition-colors border text-white"
                 style={{ borderColor: 'rgba(255,255,255,0.4)' }}
-              >
-                Create Free Account
-              </button>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mt-4">
-              <button
-                onClick={() => navigate('/demo/weekly')}
-                className="text-xs underline underline-offset-2"
-                style={{ color: '#3A6878' }}
               >
                 View read-only demo
               </button>

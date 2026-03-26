@@ -2,13 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useData } from '../../contexts/DataContext';
 import { Property, RoomType, ContractRule } from '../../types';
 import { Plus, Trash2, Save, Info } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 
 function uuid() { return crypto.randomUUID(); }
 
 export default function ConfigPage() {
   const { currentProperty, saveProperty, mode } = useData();
-  const navigate = useNavigate();
   const [prop, setProp] = useState<Property | null>(null);
   const [saved, setSaved] = useState(false);
 
@@ -23,7 +21,7 @@ export default function ConfigPage() {
   const avgCredit = totalRooms > 0 ? totalCredits / totalRooms : 0;
 
   const handleSave = () => {
-    if (mode === 'demo') { navigate('/login'); return; }
+    if (mode === 'demo') { return; }
     saveProperty({ ...prop, numRooms: totalRooms });
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
@@ -70,7 +68,7 @@ export default function ConfigPage() {
           <h1 className="text-xl font-bold" style={{ color: '#1A3C4A' }}>Configuration</h1>
           <p className="text-sm mt-0.5" style={{ color: '#3A6878' }}>{prop.name}</p>
         </div>
-        <button onClick={handleSave} className={`btn-primary flex items-center gap-2 ${saved ? 'opacity-80' : ''}`}>
+        <button onClick={handleSave} disabled={mode === 'demo'} className={`btn-primary flex items-center gap-2 ${saved ? 'opacity-80' : ''} ${mode === 'demo' ? 'opacity-50 cursor-not-allowed' : ''}`}>
           <Save size={14} /> {mode === 'demo' ? 'Sign In to Save' : saved ? 'Saved!' : 'Save Changes'}
         </button>
       </div>
@@ -265,7 +263,7 @@ export default function ConfigPage() {
       </div>
 
       <div className="flex justify-end">
-        <button onClick={handleSave} className={`btn-primary flex items-center gap-2 ${saved ? 'opacity-80' : ''}`}>
+        <button onClick={handleSave} disabled={mode === 'demo'} className={`btn-primary flex items-center gap-2 ${saved ? 'opacity-80' : ''} ${mode === 'demo' ? 'opacity-50 cursor-not-allowed' : ''}`}>
           <Save size={14} /> {mode === 'demo' ? 'Sign In to Save' : saved ? 'Saved!' : 'Save All Changes'}
         </button>
       </div>

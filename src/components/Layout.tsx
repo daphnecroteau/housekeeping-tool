@@ -149,9 +149,9 @@ export default function Layout({ children, isDemo = false }: LayoutProps) {
             <div className="text-xs text-gray-400">Viewing in demo mode</div>
             <button
               className="w-full text-left text-sm text-white px-3 py-2 rounded hover:bg-white/10 transition-colors"
-              onClick={() => navigate('/login')}
+              onClick={() => navigate('/register')}
             >
-              Sign In to Save Data →
+              Create Free Account to Save →
             </button>
           </div>
         ) : (
