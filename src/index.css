@@ -1,0 +1,92 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background-color: #F5F7F8;
+    color: #1A3C4A;
+    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+    font-size: 14px;
+  }
+  #root {
+    min-height: 100vh;
+    width: 100%;
+    text-align: left;
+    max-width: 100%;
+    border: none;
+    display: block;
+  }
+}
+
+@layer components {
+  .input-cell {
+    @apply border border-blueGray rounded px-1 py-0.5 text-right text-xs w-full focus:outline-none focus:ring-1;
+    background: #e8f4fb;
+    focus-ring-color: #2E6E82;
+  }
+  .calc-cell {
+    @apply text-right text-xs px-2 py-1;
+  }
+  .section-row {
+    @apply bg-slate900 text-white text-xs font-semibold;
+  }
+  .row-label {
+    @apply text-xs text-gray-700 px-2 py-1 font-medium sticky left-0 z-10 whitespace-nowrap;
+    background: #F5F7F8;
+    min-width: 200px;
+    border-right: 1px solid #D0DDE2;
+  }
+  .day-header {
+    @apply text-center text-xs font-semibold px-2 py-2 text-white;
+    background: #3A6878;
+  }
+  .total-col {
+    @apply text-right text-xs px-3 py-1 font-semibold;
+    background: #f0f4f6;
+    border-left: 2px solid #D0DDE2;
+  }
+  .btn-primary {
+    @apply px-4 py-2 rounded font-medium text-sm text-white transition-colors;
+    background: #C86848;
+  }
+  .btn-primary:hover { background: #b05a3a; }
+  .btn-secondary {
+    @apply px-4 py-2 rounded font-medium text-sm transition-colors;
+    background: #2E6E82;
+    color: white;
+  }
+  .btn-secondary:hover { background: #1A3C4A; }
+  .btn-ghost {
+    @apply px-4 py-2 rounded font-medium text-sm transition-colors border;
+    border-color: #D0DDE2;
+    color: #3A6878;
+  }
+  .btn-ghost:hover { background: #D0DDE2; }
+  .card {
+    @apply rounded-lg shadow-sm;
+    background: white;
+    border: 1px solid #D0DDE2;
+  }
+  .badge-callin {
+    @apply text-xs font-bold px-2 py-0.5 rounded-full;
+    background: #d1fae5;
+    color: #065f46;
+  }
+  .badge-calloff {
+    @apply text-xs font-bold px-2 py-0.5 rounded-full;
+    background: #fee2e2;
+    color: #b91c1c;
+  }
+  .badge-ontarget {
+    @apply text-xs font-bold px-2 py-0.5 rounded-full;
+    background: #e0f2fe;
+    color: #0369a1;
+  }
+}
+
+::-webkit-scrollbar { height: 5px; width: 5px; }
+::-webkit-scrollbar-track { background: #D0DDE2; }
+::-webkit-scrollbar-thumb { background: #3A6878; border-radius: 3px; }
