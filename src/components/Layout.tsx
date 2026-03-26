@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useData } from '../contexts/DataContext';
 import {
   CalendarDays, TrendingUp, ClipboardList, BarChart2, Database,
-  Settings, Building2, LogOut, Menu, X, ChevronDown, Hammer,
+  Settings, Building2, LogOut, Menu, X, ChevronDown, Hammer, House,
 } from 'lucide-react';
 
 const NAV = [
@@ -153,6 +153,13 @@ export default function Layout({ children, isDemo = false }: LayoutProps) {
             >
               Create Free Account to Save →
             </button>
+            <button
+              onClick={() => navigate('/')}
+              className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors px-1"
+            >
+              <House size={14} />
+              Back to Home
+            </button>
           </div>
         ) : (
           <div className="space-y-2">
@@ -164,6 +171,13 @@ export default function Layout({ children, isDemo = false }: LayoutProps) {
             >
               <LogOut size={14} />
               Sign Out
+            </button>
+            <button
+              onClick={() => navigate('/')}
+              className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors px-1"
+            >
+              <House size={14} />
+              Back to Home
             </button>
           </div>
         )}
