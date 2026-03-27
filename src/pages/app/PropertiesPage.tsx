@@ -3,7 +3,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useData } from '../../contexts/DataContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { Property, RoomType, ContractRule } from '../../types';
-import { Building2, Plus, Trash2, ChevronRight, Edit2 } from 'lucide-react';
+import { Building2, Plus, Trash2, ChevronRight, Edit2, Sparkles } from 'lucide-react';
+import { seedLocalSampleData } from '../../utils/sampleData';
 
 export default function PropertiesPage() {
   const { user } = useAuth();
@@ -44,10 +45,25 @@ export default function PropertiesPage() {
         <div className="card p-10 text-center">
           <Building2 size={40} className="mx-auto mb-3" style={{ color: '#D0DDE2' }} />
           <p className="font-medium mb-1" style={{ color: '#1A3C4A' }}>No properties yet</p>
-          <p className="text-sm mb-4" style={{ color: '#3A6878' }}>Add your first hotel to get started.</p>
-          <button onClick={handleCreate} className="btn-primary inline-flex items-center gap-2">
-            <Plus size={14} /> Add Property
-          </button>
+          <p className="text-sm mb-4" style={{ color: '#3A6878' }}>Add your first hotel to get started, or load sample data to explore the tool right away.</p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <button onClick={handleCreate} className="btn-primary inline-flex items-center gap-2">
+              <Plus size={14} /> Add Property
+            </button>
+            {mode === 'local' && (
+              <button
+                onClick={() => {
+                  const propId = seedLocalSampleData();
+                  setCurrentPropertyId(propId);
+                  navigate(`${basePath}/${propId}/weekly`);
+                }}
+                className="btn-ghost inline-flex items-center gap-2"
+                style={{ color: '#C86848', borderColor: '#C86848' }}
+              >
+                <Sparkles size={14} /> Load sample data
+              </button>
+            )}
+          </div>
         </div>
       )}
 

@@ -261,7 +261,6 @@ export default function OTBSchedulePage() {
           <button onClick={() => setShowImport(true)} className="btn-ghost flex items-center gap-1 text-sm">
             <ClipboardPaste size={14} /> Import
           </button>
-          {mode === 'demo' && <span className="text-xs px-2 py-1 rounded" style={{ background: '#FBE8DC', color: '#C86848' }}>Demo</span>}
         </div>
       </div>
 

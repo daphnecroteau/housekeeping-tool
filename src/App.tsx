@@ -23,10 +23,11 @@ function RequireAuth({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-// Demo app wrapper (read-only showcase)
+// Demo app wrapper (interactive showcase)
 function DemoApp() {
   return (
     <DataProvider mode="demo">
+      <OnboardingModal />
       <Layout isDemo>
         <Routes>
           <Route path="weekly" element={<WeeklySchedulePage />} />

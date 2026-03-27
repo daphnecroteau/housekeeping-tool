@@ -96,7 +96,7 @@ export default function Layout({ children, isDemo = false }: LayoutProps) {
       {/* Nav */}
       <nav className="flex-1 px-3 py-4 space-y-0.5">
         {NAV.map(({ label, icon: Icon, section }) => {
-          const to = isDemo ? `/demo/${section}` : `/app/${currentPropertyId}/${section}`;
+          const to = isDemo ? `/demo/${section}` : mode === 'local' ? `/local/${currentPropertyId}/${section}` : `/app/${currentPropertyId}/${section}`;
           const active = location.pathname.includes(`/${section}`);
           return (
             <NavLink
@@ -155,12 +155,13 @@ export default function Layout({ children, isDemo = false }: LayoutProps) {
       <div className="px-3 py-4 border-t" style={{ borderColor: '#2E6E82' }}>
         {isDemo ? (
           <div className="space-y-2">
-            <div className="text-xs text-gray-400">Viewing in demo mode</div>
+            <div className="text-xs text-gray-400 leading-snug">Demo data resets on refresh — explore freely.</div>
             <button
-              className="w-full text-left text-sm text-white px-3 py-2 rounded hover:bg-white/10 transition-colors"
+              className="w-full text-left text-xs text-white px-2 py-1.5 rounded hover:bg-white/10 transition-colors"
               onClick={() => navigate('/register')}
+              style={{ color: '#D0DDE2' }}
             >
-              Create Free Account to Save →
+              → Save your data with a free account
             </button>
           </div>
         ) : (
@@ -219,6 +220,16 @@ export default function Layout({ children, isDemo = false }: LayoutProps) {
             )}
           </div>
         </div>
+
+        {/* Excel → Web context bar (demo only) */}
+        {isDemo && (
+          <div className="flex items-center justify-between gap-3 px-4 py-2 text-xs flex-shrink-0" style={{ background: '#FBE8DC', color: '#9A4A2A' }}>
+            <span>🔧 Exploring how an Excel scheduling tool was rebuilt as a web app — fully interactive, resets on refresh.</span>
+            <NavLink to="/about" onClick={() => setSidebarOpen(false)} className="font-semibold whitespace-nowrap hover:underline" style={{ color: '#C86848' }}>
+              How it was built →
+            </NavLink>
+          </div>
+        )}
 
         {/* Content */}
         <main className="flex-1 overflow-auto" style={{ background: '#F5F7F8' }}>

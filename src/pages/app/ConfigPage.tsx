@@ -30,11 +30,10 @@ export default function ConfigPage() {
   const avgCredit = totalRooms > 0 ? totalCredits / totalRooms : 0;
 
   const handleSave = () => {
-    if (mode === 'demo') { return; }
     saveProperty({ ...prop, numRooms: totalRooms });
     setSaved(true);
     setHasUnsaved(false);
-    setShowNextStep(true);
+    if (mode !== 'demo') setShowNextStep(true);
     setTimeout(() => setSaved(false), 2000);
   };
 
@@ -89,8 +88,8 @@ export default function ConfigPage() {
               Unsaved changes
             </span>
           )}
-          <button onClick={handleSave} disabled={mode === 'demo'} className={`btn-primary flex items-center gap-2 ${saved ? 'opacity-80' : ''} ${mode === 'demo' ? 'opacity-50 cursor-not-allowed' : ''}`} title={mode === 'demo' ? 'Create a free account to save data' : undefined}>
-            <Save size={14} /> {mode === 'demo' ? 'Create Account to Save' : saved ? 'Saved!' : 'Save Changes'}
+          <button onClick={handleSave} className={`btn-primary flex items-center gap-2 ${saved ? 'opacity-80' : ''}`}>
+            <Save size={14} /> {saved ? 'Saved!' : 'Save Changes'}
           </button>
         </div>
       </div>
@@ -312,8 +311,8 @@ export default function ConfigPage() {
             Unsaved changes
           </span>
         )}
-        <button onClick={handleSave} disabled={mode === 'demo'} className={`btn-primary flex items-center gap-2 ${saved ? 'opacity-80' : ''} ${mode === 'demo' ? 'opacity-50 cursor-not-allowed' : ''}`} title={mode === 'demo' ? 'Create a free account to save data' : undefined}>
-          <Save size={14} /> {mode === 'demo' ? 'Create Account to Save' : saved ? 'Saved!' : 'Save All Changes'}
+        <button onClick={handleSave} className={`btn-primary flex items-center gap-2 ${saved ? 'opacity-80' : ''}`}>
+          <Save size={14} /> {saved ? 'Saved!' : 'Save All Changes'}
         </button>
       </div>
     </div>

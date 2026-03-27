@@ -61,7 +61,6 @@ export default function ActualsPage() {
   }, [selectedDate, currentPropertyId, getActualByDate, otbEntries, weeklySchedules, formKey]);
 
   const handleSave = () => {
-    if (mode === 'demo') { return; }
     if (!form) return;
     saveActual({ ...form, updatedAt: new Date().toISOString() });
     setSaved(true);
@@ -171,8 +170,8 @@ export default function ActualsPage() {
                 </div>
               )}
             </div>
-            <button onClick={handleSave} disabled={mode === 'demo'} className={`btn-primary flex items-center gap-1 text-sm ${saved ? 'opacity-70' : ''} ${mode === 'demo' ? 'opacity-50 cursor-not-allowed' : ''}`} title={mode === 'demo' ? 'Create a free account to save data' : undefined}>
-              <Save size={14} /> {mode === 'demo' ? 'Create Account to Save' : saved ? 'Saved!' : 'Save Actuals'}
+            <button onClick={handleSave} className={`btn-primary flex items-center gap-1 text-sm ${saved ? 'opacity-70' : ''}`}>
+              <Save size={14} /> {saved ? 'Saved!' : 'Save Actuals'}
             </button>
           </div>
 
@@ -235,7 +234,6 @@ export default function ActualsPage() {
               className="mt-1 w-full border rounded px-3 py-2 text-sm resize-none"
               style={{ borderColor: '#D0DDE2', height: '64px' }}
               placeholder="Why more/less staff? Special events, room conditions…"
-              disabled={mode === 'demo'}
             />
           </div>
         </div>

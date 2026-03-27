@@ -5,6 +5,75 @@ import { format, addDays, subDays } from 'date-fns';
 const DEMO_USER_ID = 'demo-user';
 const DEMO_PROPERTY_ID = 'demo-property-grand';
 
+// ── Local-mode sample data seeding ──────────────────────────────────────────
+// Seeds a realistic sample property into localStorage so first-time local-mode
+// users land on a fully-populated, interactive tool instead of an empty setup form.
+
+export const LOCAL_SAMPLE_PROPERTY_ID = 'local-sample-grand';
+const LOCAL_SAMPLE_SEEDED_KEY = 'hk_local_sample_v2';
+
+function lsGet<T>(key: string): T[] {
+  try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch { return []; }
+}
+function lsSet<T>(key: string, data: T[]) { localStorage.setItem(key, JSON.stringify(data)); }
+function lsUpsert<T extends { id: string }>(key: string, item: T) {
+  const list = lsGet<T>(key).filter(x => x.id !== item.id);
+  lsSet(key, [...list, item]);
+}
+
+export function isLocalSampleSeeded(): boolean {
+  return !!localStorage.getItem(LOCAL_SAMPLE_SEEDED_KEY);
+}
+
+export function seedLocalSampleData(): string {
+  // Always re-seed so data reflects current week dates
+  const prop: Property = {
+    ...DEMO_PROPERTY,
+    id: LOCAL_SAMPLE_PROPERTY_ID,
+    userId: 'local-user',
+    name: 'Grand Example Hotel',
+  };
+
+  // Property
+  lsUpsert('hk_properties', prop);
+
+  // Weekly schedules (strip out old ones for this property first, then add fresh)
+  const existingWeeklies = lsGet<WeeklySchedule>('hk_weekly_schedules')
+    .filter(w => w.propertyId !== LOCAL_SAMPLE_PROPERTY_ID);
+  lsSet('hk_weekly_schedules', [
+    ...existingWeeklies,
+    { ...DEMO_WEEKLY_CURRENT, id: 'ws-local-current', propertyId: LOCAL_SAMPLE_PROPERTY_ID },
+    { ...DEMO_WEEKLY_PREV,    id: 'ws-local-prev',    propertyId: LOCAL_SAMPLE_PROPERTY_ID },
+  ]);
+
+  // OTB entries
+  const existingOTB = lsGet<OTBEntry>('hk_otb_entries')
+    .filter(e => e.propertyId !== LOCAL_SAMPLE_PROPERTY_ID);
+  lsSet('hk_otb_entries', [
+    ...existingOTB,
+    ...buildDemoOTBEntries().map((e, i) => ({ ...e, id: `local-otb-${i}`, propertyId: LOCAL_SAMPLE_PROPERTY_ID })),
+  ]);
+
+  // Actuals
+  const existingActuals = lsGet<DailyActual>('hk_actuals')
+    .filter(a => a.propertyId !== LOCAL_SAMPLE_PROPERTY_ID);
+  lsSet('hk_actuals', [
+    ...existingActuals,
+    ...buildDemoActuals().map((a, i) => ({ ...a, id: `local-actual-${i}`, propertyId: LOCAL_SAMPLE_PROPERTY_ID })),
+  ]);
+
+  // DND records
+  const existingDND = lsGet<DNDRecord>('hk_dnd_records')
+    .filter(r => r.propertyId !== LOCAL_SAMPLE_PROPERTY_ID);
+  lsSet('hk_dnd_records', [
+    ...existingDND,
+    ...buildDemoDNDRecords().map((r, i) => ({ ...r, id: `local-dnd-${i}`, propertyId: LOCAL_SAMPLE_PROPERTY_ID })),
+  ]);
+
+  localStorage.setItem(LOCAL_SAMPLE_SEEDED_KEY, '1');
+  return LOCAL_SAMPLE_PROPERTY_ID;
+}
+
 export const DEMO_PROPERTY: Property = {
   id: DEMO_PROPERTY_ID,
   userId: DEMO_USER_ID,
