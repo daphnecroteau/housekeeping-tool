@@ -35,8 +35,9 @@ export default function ActualsPage() {
   const [form, setForm] = useState<DailyActual | null>(null);
   const [saved, setSaved] = useState(false);
   const [showImport, setShowImport] = useState(false);
+  const [formKey, setFormKey] = useState(0);
 
-  // Pre-fill from OTB or Weekly when date changes
+  // Pre-fill from OTB or Weekly when date or formKey changes
   useEffect(() => {
     if (!currentPropertyId) return;
     const existing = getActualByDate(selectedDate);
@@ -57,7 +58,7 @@ export default function ActualsPage() {
       actualDepartures: weekly.departures,
     } : {};
     setForm({ ...emptyActual(selectedDate, currentPropertyId), ...source });
-  }, [selectedDate, currentPropertyId, getActualByDate, otbEntries, weeklySchedules]);
+  }, [selectedDate, currentPropertyId, getActualByDate, otbEntries, weeklySchedules, formKey]);
 
   const handleSave = () => {
     if (mode === 'demo') { return; }
@@ -142,9 +143,9 @@ export default function ActualsPage() {
           <button onClick={() => setSelectedDate(d => addDaysStr(d, 1))} className="btn-ghost p-2"><ChevronRight size={16} /></button>
           <button onClick={() => setSelectedDate(today())} className="btn-ghost text-xs px-2 py-1">Today</button>
           <button
-            onClick={() => setSelectedDate(today())}
+            onClick={() => setFormKey(k => k + 1)}
             className="btn-primary flex items-center gap-1 text-sm"
-            title="Add today's actuals"
+            title="Clear form and start a new entry for the selected date"
           >
             <Plus size={14} /> New Entry
           </button>

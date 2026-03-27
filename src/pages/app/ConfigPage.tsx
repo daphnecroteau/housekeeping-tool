@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useData } from '../../contexts/DataContext';
 import { Property, RoomType, ContractRule } from '../../types';
-import { Plus, Trash2, Save, Info } from 'lucide-react';
+import { Plus, Trash2, Save, Info, ArrowRight } from 'lucide-react';
 
 function uuid() { return crypto.randomUUID(); }
 
 export default function ConfigPage() {
   const { currentProperty, saveProperty, mode } = useData();
+  const navigate = useNavigate();
   const [prop, setProp] = useState<Property | null>(null);
   const [saved, setSaved] = useState(false);
   const [hasUnsaved, setHasUnsaved] = useState(false);
+  const [showNextStep, setShowNextStep] = useState(false);
 
   useEffect(() => {
     if (currentProperty) { setProp(JSON.parse(JSON.stringify(currentProperty))); setHasUnsaved(false); }
@@ -31,6 +34,7 @@ export default function ConfigPage() {
     saveProperty({ ...prop, numRooms: totalRooms });
     setSaved(true);
     setHasUnsaved(false);
+    setShowNextStep(true);
     setTimeout(() => setSaved(false), 2000);
   };
 
@@ -91,6 +95,22 @@ export default function ConfigPage() {
         </div>
       </div>
 
+      {/* Next step banner — shown after save */}
+      {showNextStep && mode !== 'demo' && (
+        <div className="flex items-center justify-between gap-3 px-4 py-3 rounded-lg" style={{ background: '#d1fae5', border: '1px solid #6ee7b7' }}>
+          <div className="text-sm font-medium" style={{ color: '#065f46' }}>
+            ✓ Configuration saved! Ready to build your first weekly forecast.
+          </div>
+          <button
+            onClick={() => navigate('../weekly')}
+            className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg flex-shrink-0"
+            style={{ background: '#059669', color: 'white' }}
+          >
+            Go to Weekly Schedule <ArrowRight size={13} />
+          </button>
+        </div>
+      )}
+
       {/* General */}
       <div className="card p-5">
         <h2 className="font-semibold text-sm mb-4" style={{ color: '#1A3C4A' }}>General Settings</h2>
@@ -125,7 +145,7 @@ export default function ConfigPage() {
 
       {/* Room Types */}
       <div className="card p-5">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-3">
           <div>
             <h2 className="font-semibold text-sm" style={{ color: '#1A3C4A' }}>Room Types & Credits</h2>
             <p className="text-xs mt-0.5" style={{ color: '#3A6878' }}>
@@ -135,6 +155,12 @@ export default function ConfigPage() {
           <button onClick={addRoom} className="btn-ghost flex items-center gap-1 text-xs">
             <Plus size={12} /> Add Type
           </button>
+        </div>
+        <div className="flex items-start gap-2 p-3 rounded mb-4 text-xs" style={{ background: '#f0f9ff', color: '#0369a1', border: '1px solid #bae6fd' }}>
+          <Info size={13} className="flex-shrink-0 mt-0.5" />
+          <div>
+            <strong>What are credits?</strong> A credit is the work unit used to measure an RA's (Room Attendant's) daily workload. A standard room = 1 credit; harder rooms (suites, heavy cleans) get more. The <strong>avg credit/room ({avgCredit > 0 ? avgCredit.toFixed(3) : '—'})</strong> is used on the Weekly Schedule, OTB Schedule, and Actuals pages to estimate total workload and recommended RA count.
+          </div>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">

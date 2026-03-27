@@ -246,7 +246,7 @@ export default function OTBSchedulePage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-lg font-bold" style={{ color: '#1A3C4A' }}>OTB Schedule <span className="text-xs font-normal ml-1" style={{ color: '#9ca3af' }}>On-The-Books</span></h1>
-          <p className="text-xs mt-0.5" style={{ color: '#3A6878' }}>{currentProperty.name} · 7-day rolling view · updates staffing vs. weekly plan</p>
+          <p className="text-xs mt-0.5" style={{ color: '#3A6878' }}>{currentProperty.name} · 7-day rolling view · updates staffing vs. weekly plan · <span style={{ color: '#059669' }}>changes save automatically</span></p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           {autoSaved && (
