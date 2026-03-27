@@ -9,12 +9,18 @@ export default function ConfigPage() {
   const { currentProperty, saveProperty, mode } = useData();
   const [prop, setProp] = useState<Property | null>(null);
   const [saved, setSaved] = useState(false);
+  const [hasUnsaved, setHasUnsaved] = useState(false);
 
   useEffect(() => {
-    if (currentProperty) setProp(JSON.parse(JSON.stringify(currentProperty)));
+    if (currentProperty) { setProp(JSON.parse(JSON.stringify(currentProperty))); setHasUnsaved(false); }
   }, [currentProperty?.id]);
 
-  if (!prop) return <div className="p-6 text-sm" style={{ color: '#3A6878' }}>No property selected.</div>;
+  if (!prop) return (
+    <div className="p-6 text-sm space-y-2" style={{ color: '#3A6878' }}>
+      <div className="font-semibold" style={{ color: '#1A3C4A' }}>No property found</div>
+      <div>Use the sidebar to select an existing property, or go to <strong>Manage Properties</strong> to create one.</div>
+    </div>
+  );
 
   const totalRooms = prop.roomTypes.reduce((s, r) => s + r.numRooms, 0);
   const totalCredits = prop.roomTypes.reduce((s, r) => s + r.numRooms * r.credits, 0);
@@ -24,20 +30,23 @@ export default function ConfigPage() {
     if (mode === 'demo') { return; }
     saveProperty({ ...prop, numRooms: totalRooms });
     setSaved(true);
+    setHasUnsaved(false);
     setTimeout(() => setSaved(false), 2000);
   };
 
   const updateRoom = (id: string, field: keyof RoomType, value: string) => {
+    setHasUnsaved(true);
     setProp(p => p ? ({
       ...p,
       roomTypes: p.roomTypes.map(r => r.id === id ? { ...r, [field]: field === 'name' ? value : parseFloat(value) || 0 } : r)
     }) : p);
   };
 
-  const addRoom = () => setProp(p => p ? ({ ...p, roomTypes: [...p.roomTypes, { id: uuid(), name: `Type ${p.roomTypes.length + 1}`, numRooms: 0, credits: 1 }] }) : p);
-  const removeRoom = (id: string) => setProp(p => p ? ({ ...p, roomTypes: p.roomTypes.filter(r => r.id !== id) }) : p);
+  const addRoom = () => { setHasUnsaved(true); setProp(p => p ? ({ ...p, roomTypes: [...p.roomTypes, { id: uuid(), name: `Type ${p.roomTypes.length + 1}`, numRooms: 0, credits: 1 }] }) : p); };
+  const removeRoom = (id: string) => { setHasUnsaved(true); setProp(p => p ? ({ ...p, roomTypes: p.roomTypes.filter(r => r.id !== id) }) : p); };
 
   const updateRule = (id: string, field: keyof ContractRule, value: string) => {
+    setHasUnsaved(true);
     setProp(p => p ? ({
       ...p,
       contractRules: p.contractRules.map(r => {
@@ -51,13 +60,14 @@ export default function ConfigPage() {
   };
 
   const addRule = () => {
+    setHasUnsaved(true);
     const ruleNumber = prop.contractRules.length + 1;
     setProp(p => p ? ({
       ...p,
       contractRules: [...p.contractRules, { id: uuid(), ruleNumber, minDepartures: null, maxCredits: 13, description: '' }]
     }) : p);
   };
-  const removeRule = (id: string) => setProp(p => p ? ({ ...p, contractRules: p.contractRules.filter(r => r.id !== id) }) : p);
+  const removeRule = (id: string) => { setHasUnsaved(true); setProp(p => p ? ({ ...p, contractRules: p.contractRules.filter(r => r.id !== id) }) : p); };
 
   const sortedRules = [...prop.contractRules].sort((a, b) => b.maxCredits - a.maxCredits);
 
@@ -68,9 +78,17 @@ export default function ConfigPage() {
           <h1 className="text-xl font-bold" style={{ color: '#1A3C4A' }}>Configuration</h1>
           <p className="text-sm mt-0.5" style={{ color: '#3A6878' }}>{prop.name}</p>
         </div>
-        <button onClick={handleSave} disabled={mode === 'demo'} className={`btn-primary flex items-center gap-2 ${saved ? 'opacity-80' : ''} ${mode === 'demo' ? 'opacity-50 cursor-not-allowed' : ''}`}>
-          <Save size={14} /> {mode === 'demo' ? 'Sign In to Save' : saved ? 'Saved!' : 'Save Changes'}
-        </button>
+        <div className="flex items-center gap-3">
+          {hasUnsaved && mode !== 'demo' && (
+            <span className="text-xs flex items-center gap-1.5" style={{ color: '#b45309' }}>
+              <span className="inline-block w-2 h-2 rounded-full" style={{ background: '#f59e0b' }}></span>
+              Unsaved changes
+            </span>
+          )}
+          <button onClick={handleSave} disabled={mode === 'demo'} className={`btn-primary flex items-center gap-2 ${saved ? 'opacity-80' : ''} ${mode === 'demo' ? 'opacity-50 cursor-not-allowed' : ''}`} title={mode === 'demo' ? 'Create a free account to save data' : undefined}>
+            <Save size={14} /> {mode === 'demo' ? 'Create Account to Save' : saved ? 'Saved!' : 'Save Changes'}
+          </button>
+        </div>
       </div>
 
       {/* General */}
@@ -81,7 +99,7 @@ export default function ConfigPage() {
             <label className="block text-xs font-medium mb-1" style={{ color: '#1A3C4A' }}>Hotel Name</label>
             <input
               value={prop.name}
-              onChange={e => setProp(p => p ? { ...p, name: e.target.value } : p)}
+              onChange={e => { setHasUnsaved(true); setProp(p => p ? { ...p, name: e.target.value } : p); }}
               className="w-full border rounded px-3 py-2 text-sm" style={{ borderColor: '#D0DDE2' }}
               disabled={false}
             />
@@ -91,7 +109,7 @@ export default function ConfigPage() {
             <input
               type="number" min="1" step="0.5"
               value={prop.shiftHours}
-              onChange={e => setProp(p => p ? { ...p, shiftHours: parseFloat(e.target.value) || 8 } : p)}
+              onChange={e => { setHasUnsaved(true); setProp(p => p ? { ...p, shiftHours: parseFloat(e.target.value) || 8 } : p); }}
               className="w-full border rounded px-3 py-2 text-sm" style={{ borderColor: '#D0DDE2' }}
               disabled={false}
             />
@@ -165,22 +183,21 @@ export default function ConfigPage() {
 
       {/* Contract Rules */}
       <div className="card p-5">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h2 className="font-semibold text-sm" style={{ color: '#1A3C4A' }}>Departure Drop Rules</h2>
-            <p className="text-xs mt-0.5" style={{ color: '#3A6878' }}>Rules are applied in order from highest to lowest max credits.</p>
+        <div className="mb-4">
+          <h2 className="font-semibold text-sm" style={{ color: '#1A3C4A' }}>Departure Drop Rules</h2>
+          <p className="text-xs mt-0.5 mb-3" style={{ color: '#3A6878' }}>Rules are applied in order from highest to lowest max credits.</p>
+          <div className="flex items-start gap-2 p-3 rounded text-xs" style={{ background: '#e0f2fe', color: '#0369a1' }}>
+            <Info size={14} className="flex-shrink-0 mt-0.5" />
+            <div>
+              <strong>How rules work:</strong> Rule 1 sets the baseline max credits per RA. Each additional rule triggers when departures per RA exceed a threshold — lowering max credits raises the RA count for heavy departure days.
+              Optionally set a season (MM-DD format, e.g. 06-01) to activate a rule only during certain months.
+            </div>
           </div>
+        </div>
+        <div className="flex justify-end mb-3">
           <button onClick={addRule} className="btn-ghost flex items-center gap-1 text-xs">
             <Plus size={12} /> Add Rule
           </button>
-        </div>
-
-        <div className="flex items-start gap-2 p-3 rounded mb-4 text-xs" style={{ background: '#e0f2fe', color: '#0369a1' }}>
-          <Info size={14} className="flex-shrink-0 mt-0.5" />
-          <div>
-            <strong>How rules work:</strong> Rule 1 sets the baseline max credits. Each subsequent rule checks if the average departures/RA from the previous rule exceeds the threshold — if so, applies a lower max credits, increasing the RA count.
-            Optionally set a season (MM-DD) to activate a rule only during certain months.
-          </div>
         </div>
 
         <div className="overflow-x-auto">
@@ -262,9 +279,15 @@ export default function ConfigPage() {
         </div>
       </div>
 
-      <div className="flex justify-end">
-        <button onClick={handleSave} disabled={mode === 'demo'} className={`btn-primary flex items-center gap-2 ${saved ? 'opacity-80' : ''} ${mode === 'demo' ? 'opacity-50 cursor-not-allowed' : ''}`}>
-          <Save size={14} /> {mode === 'demo' ? 'Sign In to Save' : saved ? 'Saved!' : 'Save All Changes'}
+      <div className="flex items-center justify-end gap-3">
+        {hasUnsaved && mode !== 'demo' && (
+          <span className="text-xs flex items-center gap-1.5" style={{ color: '#b45309' }}>
+            <span className="inline-block w-2 h-2 rounded-full" style={{ background: '#f59e0b' }}></span>
+            Unsaved changes
+          </span>
+        )}
+        <button onClick={handleSave} disabled={mode === 'demo'} className={`btn-primary flex items-center gap-2 ${saved ? 'opacity-80' : ''} ${mode === 'demo' ? 'opacity-50 cursor-not-allowed' : ''}`} title={mode === 'demo' ? 'Create a free account to save data' : undefined}>
+          <Save size={14} /> {mode === 'demo' ? 'Create Account to Save' : saved ? 'Saved!' : 'Save All Changes'}
         </button>
       </div>
     </div>

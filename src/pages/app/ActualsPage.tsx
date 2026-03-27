@@ -90,7 +90,12 @@ export default function ActualsPage() {
     }
   };
 
-  if (!currentProperty || !form) return <div className="p-6 text-sm" style={{ color: '#3A6878' }}>No property selected.</div>;
+  if (!currentProperty || !form) return (
+    <div className="p-6 text-sm space-y-2" style={{ color: '#3A6878' }}>
+      <div className="font-semibold" style={{ color: '#1A3C4A' }}>No property selected</div>
+      <div>Go to <strong>Configuration</strong> in the sidebar to set up your hotel first.</div>
+    </div>
+  );
 
   const up = (field: keyof DailyActual, value: number | null | string) => setForm(f => f ? { ...f, [field]: value } : f);
   const numField = (field: keyof DailyActual) => (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -165,8 +170,8 @@ export default function ActualsPage() {
                 </div>
               )}
             </div>
-            <button onClick={handleSave} disabled={mode === 'demo'} className={`btn-primary flex items-center gap-1 text-sm ${saved ? 'opacity-70' : ''} ${mode === 'demo' ? 'opacity-50 cursor-not-allowed' : ''}`}>
-              <Save size={14} /> {mode === 'demo' ? 'Sign In to Save' : saved ? 'Saved!' : 'Save Actuals'}
+            <button onClick={handleSave} disabled={mode === 'demo'} className={`btn-primary flex items-center gap-1 text-sm ${saved ? 'opacity-70' : ''} ${mode === 'demo' ? 'opacity-50 cursor-not-allowed' : ''}`} title={mode === 'demo' ? 'Create a free account to save data' : undefined}>
+              <Save size={14} /> {mode === 'demo' ? 'Create Account to Save' : saved ? 'Saved!' : 'Save Actuals'}
             </button>
           </div>
 
@@ -302,7 +307,9 @@ export default function ActualsPage() {
             </thead>
             <tbody>
               {recentActuals.length === 0 && (
-                <tr><td colSpan={12} className="px-3 py-4 text-center" style={{ color: '#9ca3af' }}>No actuals recorded yet.</td></tr>
+                <tr><td colSpan={12} className="px-3 py-6 text-center" style={{ color: '#9ca3af' }}>
+                  No actuals recorded yet. Use the form above to log today's rooms cleaned, hours worked, and DND counts.
+                </td></tr>
               )}
               {recentActuals.map(a => {
                 const total = (a.actualDeparturesCleaned ?? 0) + (a.actualStayoversCleaned ?? 0);

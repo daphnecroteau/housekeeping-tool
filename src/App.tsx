@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { DataProvider } from './contexts/DataContext';
 import Layout from './components/Layout';
+import OnboardingModal from './components/OnboardingModal';
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -45,6 +46,7 @@ function DemoApp() {
 function LocalApp() {
   return (
     <DataProvider mode="local">
+      <OnboardingModal />
       <Routes>
         <Route path="properties" element={<PropertiesPage />} />
         <Route path=":propertyId/*" element={<LocalPropertyApp />} />

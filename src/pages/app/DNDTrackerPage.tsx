@@ -32,7 +32,12 @@ export default function DNDTrackerPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showImport, setShowImport] = useState(false);
 
-  if (!currentProperty || !currentPropertyId) return <div className="p-6 text-sm" style={{ color: '#3A6878' }}>No property selected.</div>;
+  if (!currentProperty || !currentPropertyId) return (
+    <div className="p-6 text-sm space-y-2" style={{ color: '#3A6878' }}>
+      <div className="font-semibold" style={{ color: '#1A3C4A' }}>No property selected</div>
+      <div>Go to <strong>Configuration</strong> to set up your hotel first.</div>
+    </div>
+  );
 
   const resetForm = () => {
     setDate(today()); setOcc(''); setArr(''); setDep(''); setDnds(''); setRs('');
@@ -104,6 +109,10 @@ export default function DNDTrackerPage() {
   const avg = (arr: number[]) => arr.length > 0 ? arr.reduce((s, v) => s + v, 0) / arr.length : null;
 
   const sortedRecords = [...dndRecords].sort((a, b) => b.date.localeCompare(a.date));
+
+  // Find max combined % for relative bar scaling
+  const allCombined = Object.values(byDow).map(d => avg(d.combined)).filter((v): v is number => v != null);
+  const maxCombined = allCombined.length > 0 ? Math.max(...allCombined) : 0;
 
   return (
     <div className="p-4 max-w-5xl mx-auto space-y-5">
@@ -188,10 +197,10 @@ export default function DNDTrackerPage() {
                 <div key={dow} className="flex items-center gap-3">
                   <div className="text-xs font-medium w-20" style={{ color: '#3A6878' }}>{name.slice(0, 3)}</div>
                   <div className="flex-1 relative h-4 rounded overflow-hidden" style={{ background: '#F5F7F8' }}>
-                    {combined != null && (
+                    {combined != null && maxCombined > 0 && (
                       <div
                         className="absolute inset-y-0 left-0 rounded"
-                        style={{ background: '#2E6E82', width: `${Math.min(combined * 3, 100)}%` }}
+                        style={{ background: '#2E6E82', width: `${(combined / maxCombined) * 100}%` }}
                       />
                     )}
                   </div>

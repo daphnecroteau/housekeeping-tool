@@ -9,7 +9,7 @@ import {
 
 const NAV = [
   { label: 'Weekly Schedule', icon: CalendarDays, section: 'weekly' },
-  { label: 'Daily Schedule', icon: TrendingUp, section: 'otb' },
+  { label: 'OTB Schedule', icon: TrendingUp, section: 'otb' },
   { label: 'Actuals', icon: ClipboardList, section: 'actuals' },
   { label: 'DND Tracker', icon: BarChart2, section: 'dnd' },
   { label: 'Database & Export', icon: Database, section: 'database' },
@@ -44,8 +44,17 @@ export default function Layout({ children, isDemo = false }: LayoutProps) {
           <span className="font-bold text-white text-sm leading-tight">Housekeeping<br />RA Tool</span>
         </div>
         {isDemo && (
-          <div className="mt-2 text-xs px-2 py-1 rounded" style={{ background: '#C86848', color: 'white' }}>
-            Demo Mode
+          <div className="mt-2 space-y-1">
+            <div className="text-xs px-2 py-1 rounded" style={{ background: '#C86848', color: 'white' }}>
+              Demo Mode
+            </div>
+            <button
+              onClick={() => navigate('/')}
+              className="flex items-center gap-2 text-xs text-gray-400 hover:text-white transition-colors px-1 py-1"
+            >
+              <House size={12} />
+              Back to Home
+            </button>
           </div>
         )}
       </div>
@@ -67,7 +76,7 @@ export default function Layout({ children, isDemo = false }: LayoutProps) {
                 <button
                   key={p.id}
                   className={`w-full text-left text-xs px-3 py-2 hover:bg-white/10 transition-colors ${p.id === currentPropertyId ? 'font-semibold text-white' : 'text-gray-200'}`}
-                  onClick={() => { setCurrentPropertyId(p.id); setPropMenuOpen(false); navigate(`/app/${p.id}/weekly`); }}
+                  onClick={() => { setCurrentPropertyId(p.id); setPropMenuOpen(false); navigate(mode === 'local' ? `/local/${p.id}/weekly` : `/app/${p.id}/weekly`); }}
                 >
                   {p.name}
                 </button>
@@ -75,7 +84,7 @@ export default function Layout({ children, isDemo = false }: LayoutProps) {
               <button
                 className="w-full text-left text-xs px-3 py-2 text-gray-300 hover:bg-white/10 border-t"
                 style={{ borderColor: '#1A3C4A' }}
-                onClick={() => { setPropMenuOpen(false); navigate('/app/properties'); }}
+                onClick={() => { setPropMenuOpen(false); navigate(mode === 'local' ? '/local/properties' : '/app/properties'); }}
               >
                 + Manage Properties
               </button>
@@ -153,13 +162,6 @@ export default function Layout({ children, isDemo = false }: LayoutProps) {
             >
               Create Free Account to Save →
             </button>
-            <button
-              onClick={() => navigate('/')}
-              className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors px-1"
-            >
-              <House size={14} />
-              Back to Home
-            </button>
           </div>
         ) : (
           <div className="space-y-2">
@@ -210,7 +212,12 @@ export default function Layout({ children, isDemo = false }: LayoutProps) {
           <button onClick={() => setSidebarOpen(true)} className="text-white">
             <Menu size={20} />
           </button>
-          <span className="text-white font-semibold text-sm">Housekeeping RA Tool</span>
+          <div className="flex flex-col leading-tight">
+            <span className="text-white font-semibold text-sm">Housekeeping RA Tool</span>
+            {currentProperty && (
+              <span className="text-xs" style={{ color: '#9ca3af' }}>{currentProperty.name}</span>
+            )}
+          </div>
         </div>
 
         {/* Content */}

@@ -4,7 +4,7 @@ import { useData } from '../../contexts/DataContext';
 import { OTBEntry } from '../../types';
 import { calculateDay, fmt2, fmt1, fmtInt } from '../../utils/calculations';
 import { today, getDayName, formatDisplay, addDaysStr } from '../../utils/dateUtils';
-import { ChevronLeft, ChevronRight, Edit2, ClipboardPaste } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Edit2, ClipboardPaste, Check } from 'lucide-react';
 import PasteImportModal, { ColDef } from '../../components/PasteImportModal';
 
 const OTB_COLS: ColDef[] = [
@@ -69,18 +69,23 @@ function VarianceBadge({ variance, rasScheduled }: { variance: number | undefine
 
 function InfoTooltip({ text }: { text: string }) {
   const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
+  const [tapped, setTapped] = useState(false);
   const ref = useRef<HTMLSpanElement>(null);
+
+  const show = () => {
+    if (ref.current) {
+      const r = ref.current.getBoundingClientRect();
+      setPos({ x: Math.min(r.right + 6, window.innerWidth - 230), y: r.top - 2 });
+    }
+  };
+
   return (
     <span className="inline-block" style={{ marginLeft: 4, verticalAlign: 'middle' }}>
       <span
         ref={ref}
-        onMouseEnter={() => {
-          if (ref.current) {
-            const r = ref.current.getBoundingClientRect();
-            setPos({ x: r.right + 6, y: r.top - 2 });
-          }
-        }}
-        onMouseLeave={() => setPos(null)}
+        onMouseEnter={show}
+        onMouseLeave={() => { if (!tapped) setPos(null); }}
+        onClick={() => { if (tapped) { setPos(null); setTapped(false); } else { show(); setTapped(true); } }}
         className="inline-flex items-center justify-center rounded-full cursor-help select-none"
         style={{ width: 13, height: 13, background: '#D0DDE2', color: '#3A6878', fontSize: '9px', fontWeight: 700, lineHeight: 1 }}
       >
@@ -88,7 +93,8 @@ function InfoTooltip({ text }: { text: string }) {
       </span>
       {pos && createPortal(
         <div
-          style={{ position: 'fixed', left: pos.x, top: pos.y, background: '#1A3C4A', color: 'white', padding: '6px 10px', width: 220, lineHeight: 1.5, zIndex: 9999, borderRadius: 4, boxShadow: '0 2px 8px rgba(0,0,0,0.2)', fontSize: '12px', pointerEvents: 'none' }}
+          onClick={() => { setPos(null); setTapped(false); }}
+          style={{ position: 'fixed', left: pos.x, top: pos.y, background: '#1A3C4A', color: 'white', padding: '6px 10px', width: 220, lineHeight: 1.5, zIndex: 9999, borderRadius: 4, boxShadow: '0 2px 8px rgba(0,0,0,0.2)', fontSize: '12px', cursor: 'pointer' }}
         >
           {text}
         </div>,
@@ -141,6 +147,8 @@ export default function OTBSchedulePage() {
   const [editingRas, setEditingRas] = useState<string | null>(null);
   const [editingCoFrom, setEditingCoFrom] = useState<string | null>(null);
   const [showImport, setShowImport] = useState(false);
+  const [autoSaved, setAutoSaved] = useState(false);
+  const autoSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const dates = Array.from({ length: 7 }, (_, i) => addDaysStr(windowStart, i));
   const todayStr = today();
@@ -167,6 +175,11 @@ export default function OTBSchedulePage() {
   const updateEntry = useCallback((date: string, updates: Partial<OTBEntry>) => {
     const entry = getEntry(date);
     saveOTBEntry({ ...entry, ...updates, updatedAt: new Date().toISOString() });
+    if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current);
+    autoSaveTimer.current = setTimeout(() => {
+      setAutoSaved(true);
+      setTimeout(() => setAutoSaved(false), 2000);
+    }, 600);
   }, [getEntry, saveOTBEntry]);
 
   const handleImport = (rows: Record<string, string | number | null>[]) => {
@@ -183,7 +196,12 @@ export default function OTBSchedulePage() {
   };
 
   if (!currentProperty || !currentPropertyId) {
-    return <div className="p-6 text-sm" style={{ color: '#3A6878' }}>No property selected.</div>;
+    return (
+      <div className="p-6 text-sm space-y-2" style={{ color: '#3A6878' }}>
+        <div className="font-semibold" style={{ color: '#1A3C4A' }}>No property selected</div>
+        <div>Go to <strong>Configuration</strong> to set up your hotel, or use the property selector in the sidebar.</div>
+      </div>
+    );
   }
 
   const entries = dates.map(d => getEntry(d));
@@ -227,10 +245,15 @@ export default function OTBSchedulePage() {
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-lg font-bold" style={{ color: '#1A3C4A' }}>Daily Schedule</h1>
-          <p className="text-xs mt-0.5" style={{ color: '#3A6878' }}>{currentProperty.name} · 7-day rolling view</p>
+          <h1 className="text-lg font-bold" style={{ color: '#1A3C4A' }}>OTB Schedule <span className="text-xs font-normal ml-1" style={{ color: '#9ca3af' }}>On-The-Books</span></h1>
+          <p className="text-xs mt-0.5" style={{ color: '#3A6878' }}>{currentProperty.name} · 7-day rolling view · updates staffing vs. weekly plan</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          {autoSaved && (
+            <span className="flex items-center gap-1 text-xs font-medium" style={{ color: '#059669' }}>
+              <Check size={12} /> Auto-saved
+            </span>
+          )}
           <button onClick={() => setWindowStart(d => addDaysStr(d, -7))} className="btn-ghost p-2"><ChevronLeft size={16} /></button>
           <div className="text-sm font-medium px-2" style={{ color: '#1A3C4A' }}>{rangeLabel}</div>
           <button onClick={() => setWindowStart(d => addDaysStr(d, 7))} className="btn-ghost p-2"><ChevronRight size={16} /></button>
@@ -240,6 +263,11 @@ export default function OTBSchedulePage() {
           </button>
           {mode === 'demo' && <span className="text-xs px-2 py-1 rounded" style={{ background: '#FBE8DC', color: '#C86848' }}>Demo</span>}
         </div>
+      </div>
+
+      {/* Mobile scroll hint */}
+      <div className="lg:hidden text-xs text-center py-1.5 rounded" style={{ background: '#e0f2fe', color: '#0369a1' }}>
+        ← Swipe left/right to see all days →
       </div>
 
       {/* Table */}
@@ -253,7 +281,7 @@ export default function OTBSchedulePage() {
             <thead>
               <tr>
                 <th className="sticky left-0 z-10 text-left px-3 py-2 text-xs font-semibold border-r" style={{ background: '#1A3C4A', color: 'white', borderColor: '#2E6E82' }}>
-                  Daily Schedule
+                  OTB Schedule
                 </th>
                 {entries.map((e) => {
                   const isToday = e.date === todayStr;

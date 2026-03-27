@@ -144,7 +144,12 @@ export default function WeeklySchedulePage() {
   };
 
   if (!currentProperty || !schedule) {
-    return <div className="p-6 text-sm" style={{ color: '#3A6878' }}>No property selected.</div>;
+    return (
+      <div className="p-6 text-sm space-y-2" style={{ color: '#3A6878' }}>
+        <div className="font-semibold" style={{ color: '#1A3C4A' }}>No property selected</div>
+        <div>Go to <strong>Configuration</strong> in the sidebar to set up your hotel, or use the property selector to switch properties.</div>
+      </div>
+    );
   }
 
   const days = schedule.days;
@@ -223,11 +228,16 @@ export default function WeeklySchedulePage() {
           <button onClick={() => setShowImport(true)} className="btn-ghost flex items-center gap-1 text-sm">
             <ClipboardPaste size={14} /> Import
           </button>
-          <button onClick={handleSave} disabled={mode === 'demo'} className={`btn-primary flex items-center gap-1 text-sm ${saved ? 'opacity-70' : ''} ${mode === 'demo' ? 'opacity-50 cursor-not-allowed' : ''}`}>
-            <Save size={14} /> {mode === 'demo' ? 'Sign In to Save' : saved ? 'Saved!' : 'Save'}
+          <button onClick={handleSave} disabled={mode === 'demo'} className={`btn-primary flex items-center gap-1 text-sm ${saved ? 'opacity-70' : ''} ${mode === 'demo' ? 'opacity-50 cursor-not-allowed' : ''}`} title={mode === 'demo' ? 'Create a free account to save data' : undefined}>
+            <Save size={14} /> {mode === 'demo' ? 'Create Account to Save' : saved ? 'Saved!' : 'Save'}
           </button>
           {mode === 'demo' && <span className="text-xs px-2 py-1 rounded" style={{ background: '#FBE8DC', color: '#C86848' }}>Demo</span>}
         </div>
+      </div>
+
+      {/* Mobile scroll hint */}
+      <div className="lg:hidden text-xs text-center py-1.5 rounded" style={{ background: '#e0f2fe', color: '#0369a1' }}>
+        ← Swipe left/right to see all days →
       </div>
 
       {/* Schedule Table */}
@@ -434,7 +444,8 @@ export default function WeeklySchedulePage() {
       <div className="flex flex-wrap gap-4 text-xs" style={{ color: '#3A6878' }}>
         <span><span className="inline-block w-3 h-3 rounded mr-1 align-middle" style={{ background: '#e8f4fb' }}></span>Input cell</span>
         <span><span className="inline-block w-3 h-3 rounded mr-1 align-middle border" style={{ background: 'white', borderColor: '#D0DDE2' }}></span>Calculated cell</span>
-        <span>DND % is entered as a percentage (e.g. 15 for 15%)</span>
+        <span>DND % is entered as a number (e.g. 15 for 15%)</span>
+        <span style={{ color: '#9ca3af' }}>RA = Room Attendant · DND = Do Not Disturb · RS = Refused Service</span>
       </div>
     </div>
   );
@@ -442,18 +453,23 @@ export default function WeeklySchedulePage() {
 
 function InfoTooltip({ text }: { text: string }) {
   const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
+  const [tapped, setTapped] = useState(false);
   const ref = useRef<HTMLSpanElement>(null);
+
+  const show = () => {
+    if (ref.current) {
+      const r = ref.current.getBoundingClientRect();
+      setPos({ x: Math.min(r.right + 6, window.innerWidth - 230), y: r.top - 2 });
+    }
+  };
+
   return (
     <span className="inline-block" style={{ marginLeft: 4, verticalAlign: 'middle' }}>
       <span
         ref={ref}
-        onMouseEnter={() => {
-          if (ref.current) {
-            const r = ref.current.getBoundingClientRect();
-            setPos({ x: r.right + 6, y: r.top - 2 });
-          }
-        }}
-        onMouseLeave={() => setPos(null)}
+        onMouseEnter={show}
+        onMouseLeave={() => { if (!tapped) setPos(null); }}
+        onClick={() => { if (tapped) { setPos(null); setTapped(false); } else { show(); setTapped(true); } }}
         className="inline-flex items-center justify-center rounded-full cursor-help select-none"
         style={{ width: 13, height: 13, background: '#D0DDE2', color: '#3A6878', fontSize: '9px', fontWeight: 700, lineHeight: 1 }}
       >
@@ -461,7 +477,8 @@ function InfoTooltip({ text }: { text: string }) {
       </span>
       {pos && createPortal(
         <div
-          style={{ position: 'fixed', left: pos.x, top: pos.y, background: '#1A3C4A', color: 'white', padding: '6px 10px', width: 220, lineHeight: 1.5, zIndex: 9999, borderRadius: 4, boxShadow: '0 2px 8px rgba(0,0,0,0.2)', fontSize: '12px', pointerEvents: 'none' }}
+          onClick={() => { setPos(null); setTapped(false); }}
+          style={{ position: 'fixed', left: pos.x, top: pos.y, background: '#1A3C4A', color: 'white', padding: '6px 10px', width: 220, lineHeight: 1.5, zIndex: 9999, borderRadius: 4, boxShadow: '0 2px 8px rgba(0,0,0,0.2)', fontSize: '12px', cursor: 'pointer' }}
         >
           {text}
         </div>,
